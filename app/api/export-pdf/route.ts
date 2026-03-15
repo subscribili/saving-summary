@@ -1,15 +1,31 @@
 import { NextRequest, NextResponse } from "next/server";
+import chromium from "@sparticuz/chromium";
 import puppeteer from "puppeteer-core";
 import { renderDocumentHtml } from "@/lib/pdf-template";
 import { FeeScheduleDocument } from "@/lib/types";
 
-function getExecutablePath() {
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
+async function getLaunchOptions() {
+  if (process.env.VERCEL) {
+    return {
+      executablePath: await chromium.executablePath(),
+      headless: true,
+      args: [...chromium.args, "--hide-scrollbars"],
+    };
+  }
+
   const candidates = [
     "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
     "/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge",
   ];
 
-  return candidates.find((candidate) => !!candidate) ?? candidates[0];
+  return {
+    executablePath: candidates[0],
+    headless: true,
+    args: ["--no-sandbox", "--disable-setuid-sandbox"],
+  };
 }
 
 export async function POST(request: NextRequest) {
@@ -19,22 +35,17 @@ export async function POST(request: NextRequest) {
     const document = (await request.json()) as FeeScheduleDocument;
     const html = renderDocumentHtml(document);
 
-    browser = await puppeteer.launch({
-      executablePath: getExecutablePath(),
-      headless: true,
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
-    });
+    browser = await puppeteer.launch(await getLaunchOptions());
 
     const page = await browser.newPage();
     await page.setViewport({ width: 1600, height: 2240, deviceScaleFactor: 2 });
     await page.setContent(html, { waitUntil: "networkidle0" });
-
-    await page.emulateMediaType('screen');
+    await page.emulateMediaType("screen");
 
     const pdf = await page.pdf({
       printBackground: true,
       preferCSSPageSize: true,
-      margin: { top: '0', right: '0', bottom: '0', left: '0' },
+      margin: { top: "0", right: "0", bottom: "0", left: "0" },
       scale: 1,
     });
 
