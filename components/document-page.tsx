@@ -14,15 +14,15 @@ const CELL_BORDER_WIDTH = "0.75px";
 
 function LogoHeader({ logoDataUrl }: { logoDataUrl: string | null }) {
   if (!logoDataUrl) {
-    return <div className="h-[100px]" />;
+    return <div className="h-[64px]" />;
   }
 
   return (
-    <div className="flex h-[100px] items-center">
+    <div className="flex h-[64px] items-center">
       <Image
         alt="Brand logo"
-        className="h-[100px] w-auto object-contain object-left"
-        height={100}
+        className="max-h-[64px] w-auto object-contain object-left"
+        height={64}
         src={logoDataUrl}
         unoptimized
         width={420}
@@ -68,6 +68,11 @@ function FeeScheduleTable({
   config: FeeScheduleConfig;
 }) {
   const columns = `160px minmax(0,1fr) repeat(${plans.length}, 160px)`;
+  const hasTableContent = page.segments.some((segment) => segment.items.length > 0);
+
+  if (!hasTableContent) {
+    return null;
+  }
 
   return (
     <div className="overflow-hidden border-l" style={{ borderColor: CELL_BORDER_COLOR, borderWidth: CELL_BORDER_WIDTH }}>
@@ -158,7 +163,7 @@ export function DocumentPage({ config, plans, page, exportTarget = false }: Docu
     >
       <div className="flex flex-col">
         {page.showIntro ? (
-          <div className="mb-12 flex flex-col gap-4">
+          <div className="mb-12 flex flex-col gap-16">
             <LogoHeader logoDataUrl={config.logoDataUrl} />
             <div className="space-y-4">
               <h1 className="font-display text-left text-[36px] font-medium leading-[40px] tracking-[-0.04em] text-[#22211F]">

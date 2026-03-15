@@ -8,9 +8,8 @@ const PAGE_HEIGHT = pageMetrics.height;
 const CONTENT_WIDTH = PAGE_WIDTH - pageMetrics.paddingX * 2;
 const CPT_COL = 160;
 const PLAN_COL = 160;
-const DESC_COL = CONTENT_WIDTH - CPT_COL - PLAN_COL * 4;
 const ROW_HEIGHT = 56;
-const LOGO_HEIGHT = 100;
+const LOGO_HEIGHT = 64;
 const BORDER_WIDTH = 0.75;
 const POWERED_BY_PNG = readFileSync(path.join(process.cwd(), "public", "poweredby-subscribili-logo.png")).toString("base64");
 
@@ -24,11 +23,29 @@ function escapeHtml(value: string) {
 }
 
 function buildColumns(planCount: number) {
-  return `${CPT_COL}px ${DESC_COL}px repeat(${planCount}, ${PLAN_COL}px)`;
+  const descriptionWidth = CONTENT_WIDTH - CPT_COL - PLAN_COL * planCount;
+  return `${CPT_COL}px ${descriptionWidth}px repeat(${planCount}, ${PLAN_COL}px)`;
 }
 
 function renderPoweredByLogo() {
   return `<img class="powered-image" src="data:image/png;base64,${POWERED_BY_PNG}" alt="Powered by Subscribili" />`;
+}
+
+function resolveImageSrc(src: string) {
+  if (!src.startsWith("/")) {
+    return src;
+  }
+
+  const assetPath = path.join(process.cwd(), "public", src.replace(/^\//, ""));
+  const ext = path.extname(assetPath).toLowerCase();
+  const mimeType =
+    ext === ".png"
+      ? "image/png"
+      : ext === ".jpg" || ext === ".jpeg"
+        ? "image/jpeg"
+        : "application/octet-stream";
+
+  return `data:${mimeType};base64,${readFileSync(assetPath).toString("base64")}`;
 }
 
 export function renderDocumentHtml(document: FeeScheduleDocument) {
@@ -40,7 +57,7 @@ export function renderDocumentHtml(document: FeeScheduleDocument) {
       const intro = page.showIntro
         ? `
           <div class="intro">
-            <div class="logo-wrap">${document.config.logoDataUrl ? `<img src="${document.config.logoDataUrl}" class="logo" alt="Logo" />` : ""}</div>
+            <div class="logo-wrap">${document.config.logoDataUrl ? `<img src="${resolveImageSrc(document.config.logoDataUrl)}" class="logo" alt="Logo" />` : ""}</div>
             <div class="heading-block">
               <h1>${escapeHtml(document.config.title)}</h1>
               <p class="disclaimer top">${escapeHtml(document.config.topDisclaimer)}</p>
@@ -48,6 +65,8 @@ export function renderDocumentHtml(document: FeeScheduleDocument) {
           </div>
         `
         : "";
+
+      const hasTableContent = page.segments.some((segment) => segment.items.length > 0);
 
       const tableHeader = `
         <div class="row" style="grid-template-columns:${columns}">
@@ -93,10 +112,7 @@ export function renderDocumentHtml(document: FeeScheduleDocument) {
       return `
         <section class="page">
           ${intro}
-          <div class="table-shell">
-            ${tableHeader}
-            ${segments}
-          </div>
+          ${hasTableContent ? `<div class="table-shell">${tableHeader}${segments}</div>` : ""}
           ${outro}
         </section>
       `;
@@ -133,7 +149,7 @@ export function renderDocumentHtml(document: FeeScheduleDocument) {
             flex-direction: column;
           }
           .page:last-child { page-break-after: auto; }
-          .intro { display: flex; flex-direction: column; gap: 16px; margin-bottom: 48px; }
+          .intro { display: flex; flex-direction: column; gap: 64px; margin-bottom: 48px; }
           .logo-wrap { height: ${LOGO_HEIGHT}px; display: flex; align-items: center; }
           .logo { max-height: ${LOGO_HEIGHT}px; width: auto; max-width: 420px; object-fit: contain; }
           .heading-block { display: flex; flex-direction: column; gap: 16px; }

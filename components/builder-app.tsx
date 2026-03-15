@@ -4,7 +4,7 @@ import { useMemo, useState, useTransition } from "react";
 import { DocumentPreview } from "@/components/document-preview";
 import { SettingsPanel } from "@/components/settings-panel";
 import { exportDocumentPdf } from "@/lib/export-pdf";
-import { defaultDocument } from "@/lib/mock-data";
+import { DEFAULT_LOGO_PATH, defaultDocument } from "@/lib/mock-data";
 import { paginateDocument } from "@/lib/pagination";
 import { FeeScheduleConfig, FeeScheduleDocument } from "@/lib/types";
 
@@ -30,7 +30,7 @@ export function BuilderApp() {
 
   function updateLogo(file: File | null) {
     if (!file) {
-      updateConfig("logoDataUrl", null);
+      updateConfig("logoDataUrl", DEFAULT_LOGO_PATH);
       return;
     }
 

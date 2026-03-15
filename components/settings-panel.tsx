@@ -160,6 +160,7 @@ function UploadField({
   onChange: (file: File | null) => void;
 }) {
   const inputId = useId();
+  const hasCustomLogo = Boolean(logoDataUrl && logoDataUrl.startsWith("data:"));
 
   function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
     onChange(event.target.files?.[0] ?? null);
@@ -169,14 +170,14 @@ function UploadField({
     <div className="flex flex-col gap-2">
       <FieldLabel>{label}</FieldLabel>
       <div className="rounded-xl border border-dashed bg-white" style={{ borderColor: TOKENS.borderPrimary }}>
-        {logoDataUrl ? (
+        {hasCustomLogo ? (
           <div className="flex h-[140px] flex-col items-center justify-center gap-3 px-6 py-5 text-center">
             <div className="flex h-[72px] items-center justify-center">
               <Image
                 alt="Uploaded brand logo"
                 className="max-h-[72px] w-auto object-contain"
                 height={72}
-                src={logoDataUrl}
+                src={logoDataUrl ?? ""}
                 unoptimized
                 width={240}
               />
