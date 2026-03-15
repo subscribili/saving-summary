@@ -8,7 +8,7 @@ Saving Summary Builder is a Next.js MVP that turns Google Sheet fee data into a 
 - TypeScript
 - Tailwind CSS v4
 - React 19
-- No PDF or CSV dependencies
+- Minimal dependencies
 
 ## Features
 
@@ -18,7 +18,7 @@ Saving Summary Builder is a Next.js MVP that turns Google Sheet fee data into a 
 - Branding controls for logo, table headers, category rows, and banner
 - Editable title, banner, and disclaimer copy
 - Public Google Sheet CSV import through a Next.js API route
-- Browser print to PDF with artboard-sized pages
+- Multi-page PDF export from the app
 
 ## Expected Google Sheet format
 
@@ -39,17 +39,11 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ## Vercel deployment
 
-1. Push the project to a Git repository.
+1. Push the project to GitHub.
 2. Import the repo into Vercel.
 3. Deploy with the default Next.js settings.
 
 No environment variables are required for the MVP.
-
-## Notes on PDF export
-
-- Use the `Export as PDF` button.
-- The app uses the browser print flow so the on-screen artboards map directly to printable pages.
-- For best results, choose `Save as PDF` and keep browser scaling at 100%.
 
 ## Architecture overview
 
